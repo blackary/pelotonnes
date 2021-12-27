@@ -134,3 +134,17 @@ class Aggregation(object):
                 / pd.Series(total_cadence_minutes),
             }
         ).sort_index()
+        self.styled_aggregated_df = self.aggregated_df.style.format(
+            {
+                "Total Workouts": "{:,.0f}",
+                "Total Minutes": "{:,.0f}",
+                "Total Distance": "{:,.2f}",
+                "Total Output": "{:,.0f}",
+                "Total Calories": "{:,.0f}",
+                "Output per Minute": "{:,.2f}",
+                "Calories per Minute": "{:,.2f}",
+                "Avg. Heartrate": "{:,.2f}",
+                "Avg. Speed (mph)": "{:,.2f}",
+                "Avg. Cadence (RPM)": "{:,.2f}",
+            },
+        )

@@ -13,7 +13,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
         )
         return
 
-    st.dataframe(aggregation.aggregated_df)
+    st.dataframe(aggregation.styled_aggregated_df)
 
     with st.expander("Visualization Options"):
         log_scale = st.checkbox(
@@ -39,6 +39,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 text=aggregation.aggregated_df.index,
                 log_x=log_scale,
             )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
             fig.update_traces(marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
@@ -60,6 +65,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 x="Avg. Cadence (RPM)",
                 y="Output per Minute",
                 text=aggregation.aggregated_df.index,
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_traces(marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
@@ -85,6 +95,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 text=aggregation.aggregated_df.index,
                 log_x=log_scale,
             )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
             fig.update_traces(marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
@@ -95,6 +110,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 y="Calories per Minute",
                 text=aggregation.aggregated_df.index,
                 log_x=log_scale,
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_traces(marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
@@ -112,6 +132,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "value": "Output per Minute",
                 },
             )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -126,6 +151,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "index": readable_class_characteristic,
                     "value": "Calories per Minute",
                 },
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
@@ -146,6 +176,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 },
                 log_y=log_scale,
             )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -162,6 +197,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "index": readable_class_characteristic,
                     "value": "Avg. Heartrate",
                 },
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
@@ -182,6 +222,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 },
                 log_y=log_scale,
             )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -199,6 +244,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "value": "Total Workouts",
                 },
                 log_y=log_scale,
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
@@ -219,6 +269,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 },
                 log_y=log_scale,
             )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -236,6 +291,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "value": "Total Calories",
                 },
                 log_y=log_scale,
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
@@ -255,6 +315,11 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "value": "Total Distance",
                 },
                 log_y=log_scale,
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)

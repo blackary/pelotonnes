@@ -52,4 +52,4 @@ def render_stats_all_time():
 
     st.markdown("Keep it up!")
 
-    st.dataframe(all_time_df.T)
+    st.dataframe(st.session_state["workouts_aggregation_all_time"].styled_aggregated_df)
