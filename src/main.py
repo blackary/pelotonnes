@@ -3,9 +3,10 @@ import time
 from collections import defaultdict
 
 import dateparser
-import streamlit as st
-import pandas as pd
 import numpy as np
+import plotly.express as px
+import pandas as pd
+import streamlit as st
 
 
 class Aggregation(object):
@@ -23,6 +24,10 @@ class Aggregation(object):
             # Get the value for the group_by column
             if group_by:
                 key = row[group_by]
+
+                # Skip rows with an invalid key
+                if pd.isnull(key):
+                    continue
             else:
                 key = "All Time"
 
@@ -44,6 +49,8 @@ class Aggregation(object):
                 "Total Distance": pd.Series(total_distance),
                 "Total Output": pd.Series(total_output),
                 "Total Calories": pd.Series(total_calories),
+                "Calories per Minute": pd.Series(total_calories)
+                / pd.Series(total_time),
             }
         )
 
@@ -96,6 +103,9 @@ def process_workouts_df():
     st.session_state["workouts_aggregation_by_week"] = Aggregation(
         workouts_df, "c_week"
     )
+    st.session_state["workouts_aggregation_by_instructor"] = Aggregation(
+        workouts_df, "Instructor Name"
+    )
 
 
 def render_upload_workouts():
@@ -108,8 +118,8 @@ def render_upload_workouts():
     st.markdown(workouts_guide)
 
     workouts_help = """
-    We do not save any of your personal data. To learn more, or
-    to see the source code, go to https://github.com/jfkirk/pelotodos.
+    We do not log or save any of your personal data. To learn more, or
+    to see the source code, go to https://github.com/jfkirk/pelotonnes.
     """
     raw_workouts = st.file_uploader(
         "Upload your workouts",
@@ -132,7 +142,6 @@ def render_upload_workouts():
     if "workouts_df" in st.session_state:
         st.subheader("Workouts")
         st.dataframe(st.session_state["workouts_df"])
-        print(workouts_df)
 
 
 def render_all_time_stats():
@@ -184,34 +193,112 @@ def render_stats_by_month():
     )
 
 
+def render_stats_by_instructor():
+    st.title("Stats By Instructor")
+
+    if "workouts_df" not in st.session_state:
+        st.text("Workouts have not been uploaded. See 'Upload Workouts' to the left.")
+        return
+
+    aggregation = st.session_state["workouts_aggregation_by_instructor"]
+    st.dataframe(aggregation.aggregated_df)
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+        st.subheader("Calories per Minute")
+        sorted_cpm = aggregation.aggregated_df["Calories per Minute"].sort_values(
+            ascending=False
+        )
+        fig = px.bar(
+            sorted_cpm, labels={"index": "Instructor", "value": "Calories per Minute"}
+        )
+        st.plotly_chart(fig)
+
+    with c2:
+        st.subheader("Total Minutes")
+        sorted_minutes = aggregation.aggregated_df["Total Minutes"].sort_values(
+            ascending=False
+        )
+        fig = px.bar(
+            sorted_minutes, labels={"index": "Instructor", "value": "Total Minutes"}
+        )
+        st.plotly_chart(fig)
+
+    st.subheader("Calories per Minute vs Total Minutes")
+    fig = px.scatter(
+        aggregation.aggregated_df,
+        x="Total Minutes",
+        y="Calories per Minute",
+        text=aggregation.aggregated_df.index,
+    )
+    fig.update_traces(marker_size=10)
+    st.plotly_chart(fig)
+
+    st.subheader("Total Workouts")
+    sorted_workouts = aggregation.aggregated_df["Total Workouts"].sort_values(
+        ascending=False
+    )
+    fig = px.bar(
+        sorted_workouts, labels={"index": "Instructor", "value": "Total Workouts"}
+    )
+    st.plotly_chart(fig)
+
+    st.subheader("Total Output")
+    sorted_output = aggregation.aggregated_df["Total Output"].sort_values(
+        ascending=False
+    )
+    fig = px.bar(sorted_output, labels={"index": "Instructor", "value": "Total Output"})
+    st.plotly_chart(fig)
+
+    st.subheader("Total Calories")
+    sorted_calories = aggregation.aggregated_df["Total Calories"].sort_values(
+        ascending=False
+    )
+    fig = px.bar(
+        sorted_calories, labels={"index": "Instructor", "value": "Total Calories"}
+    )
+    st.plotly_chart(fig)
+
+    st.subheader("Total Distance")
+    sorted_distance = aggregation.aggregated_df["Total Distance"].sort_values(
+        ascending=False
+    )
+    fig = px.bar(
+        sorted_distance, labels={"index": "Instructor", "value": "Total Distance"}
+    )
+    st.plotly_chart(fig)
+
+
 def render_about():
-    st.title("About Pelotodos")
-    st.markdown("Pelotodos is a tool for visualizing your workouts.")
+    st.title("About Pelotonnes")
+    st.markdown("Pelotonnes is a tool for visualizing your workouts.")
     st.markdown(
-        "Pelotodos is not associated with Peloton Interactive, Inc. in any way - except"
+        "Pelotonnes is not associated with Peloton Interactive, Inc. in any way - except"
         + " as fans."
     )
     st.markdown(
         "To learn more, or to see the source code, see "
-        + "[GitHub](https://github.com/jfkirk/pelotodos)."
+        + "[GitHub](https://github.com/jfkirk/pelotonnes)."
     )
 
 
 def main():
-    st.sidebar.title("Pelotodos")
+    st.set_page_config(layout="wide")
+    st.sidebar.title("Pelotonnes")
 
-    pages = ["Upload Workouts", "All-Time Stats", "Stats By Month", "About"]
-    app_mode = st.sidebar.radio("Tools", options=pages)
+    pages = {
+        "Upload Workouts": render_upload_workouts,
+        "All-Time Stats": render_all_time_stats,
+        "Stats By Month": render_stats_by_month,
+        "Stats By Instructor": render_stats_by_instructor,
+        "About": render_about,
+    }
+    app_mode = st.sidebar.radio("Tools", options=pages.keys())
     st.session_state["app_mode"] = app_mode
 
-    if st.session_state["app_mode"] == "Upload Workouts":
-        render_upload_workouts()
-    elif st.session_state["app_mode"] == "All-Time Stats":
-        render_all_time_stats()
-    elif st.session_state["app_mode"] == "Stats By Month":
-        render_stats_by_month()
-    elif st.session_state["app_mode"] == "About":
-        render_about()
+    # Render the selected page
+    pages[app_mode]()
 
 
 main()
