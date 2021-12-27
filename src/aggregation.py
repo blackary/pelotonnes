@@ -133,4 +133,4 @@ class Aggregation(object):
                 "Avg. Cadence (RPM)": pd.Series(total_cadence)
                 / pd.Series(total_cadence_minutes),
             }
-        )
+        ).sort_index()

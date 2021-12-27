@@ -77,9 +77,9 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            st.subheader("Calories per Minute vs Total Minutes")
             fig = px.scatter(
                 aggregation.aggregated_df,
+                title="Calories per Minute vs Total Minutes",
                 x="Total Minutes",
                 y="Calories per Minute",
                 text=aggregation.aggregated_df.index,
@@ -88,9 +88,9 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig.update_traces(marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
-            st.subheader("Calories per Minute vs Avg. Cadence (RPM)")
             fig = px.scatter(
                 aggregation.aggregated_df,
+                title="Calories per Minute vs Avg. Cadence (RPM)",
                 x="Avg. Cadence (RPM)",
                 y="Calories per Minute",
                 text=aggregation.aggregated_df.index,
@@ -101,14 +101,12 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            st.subheader(
-                "Output per Minute by {}".format(readable_class_characteristic)
-            )
             sorted_opm = aggregation.aggregated_df["Output per Minute"].sort_values(
                 ascending=False
             )
             fig = px.bar(
                 sorted_opm,
+                title="Output per Minute by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Output per Minute",
@@ -118,14 +116,12 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             st.plotly_chart(fig, use_container_width=True)
 
         with c2:
-            st.subheader(
-                "Calories per Minute by {}".format(readable_class_characteristic)
-            )
             sorted_cpm = aggregation.aggregated_df["Calories per Minute"].sort_values(
                 ascending=False
             )
             fig = px.bar(
                 sorted_cpm,
+                title="Calories per Minute by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Calories per Minute",
@@ -136,7 +132,6 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            st.subheader("Avg. Speed (mph) by {}".format(readable_class_characteristic))
             sorted_distance = (
                 aggregation.aggregated_df["Avg. Speed (mph)"]
                 .sort_values(ascending=False)
@@ -144,6 +139,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             )
             fig = px.bar(
                 sorted_distance,
+                title="Avg. Speed (mph) by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Avg. Speed (mph)",
@@ -154,7 +150,6 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             st.plotly_chart(fig, use_container_width=True)
 
         with c2:
-            st.subheader("Avg. Heartrate by {}".format(readable_class_characteristic))
             sorted_calories = (
                 aggregation.aggregated_df["Avg. Heartrate"]
                 .sort_values(ascending=False)
@@ -162,6 +157,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             )
             fig = px.bar(
                 sorted_calories,
+                title="Avg. Heartrate by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Avg. Heartrate",
@@ -174,12 +170,12 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            st.subheader("Total Minutes by {}".format(readable_class_characteristic))
             sorted_minutes = aggregation.aggregated_df["Total Minutes"].sort_values(
                 ascending=False
             )
             fig = px.bar(
                 sorted_minutes,
+                title="Total Minutes by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Total Minutes",
@@ -190,7 +186,6 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             st.plotly_chart(fig, use_container_width=True)
 
         with c2:
-            st.subheader("Total Workouts by {}".format(readable_class_characteristic))
             sorted_workouts = (
                 aggregation.aggregated_df["Total Workouts"]
                 .sort_values(ascending=False)
@@ -198,6 +193,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             )
             fig = px.bar(
                 sorted_workouts,
+                title="Total Workouts by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Total Workouts",
@@ -209,7 +205,6 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            st.subheader("Total Output by {}".format(readable_class_characteristic))
             sorted_output = (
                 aggregation.aggregated_df["Total Output"]
                 .sort_values(ascending=False)
@@ -217,6 +212,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             )
             fig = px.bar(
                 sorted_output,
+                title="Total Output by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Total Output",
@@ -227,7 +223,6 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             st.plotly_chart(fig, use_container_width=True)
 
         with c2:
-            st.subheader("Total Calories by {}".format(readable_class_characteristic))
             sorted_calories = (
                 aggregation.aggregated_df["Total Calories"]
                 .sort_values(ascending=False)
@@ -235,6 +230,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             )
             fig = px.bar(
                 sorted_calories,
+                title="Total Calories by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Total Calories",
@@ -246,7 +242,6 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            st.subheader("Total Distance by {}".format(readable_class_characteristic))
             sorted_distance = (
                 aggregation.aggregated_df["Total Distance"]
                 .sort_values(ascending=False)
@@ -254,6 +249,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             )
             fig = px.bar(
                 sorted_distance,
+                title="Total Distance by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
                     "value": "Total Distance",

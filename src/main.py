@@ -1,15 +1,9 @@
-import datetime
-
-import dateparser
-import numpy as np
-import plotly.express as px
 import pandas as pd
 import streamlit as st
 
-from aggregation import Aggregation, process_workouts_df
+from aggregation import process_workouts_df
 from render_stats_by_time import render_stats_by_time
 from render_stats_by_class import render_stats_by_class
-from render_stats_by_instructor import render_stats_by_instructor
 from render_stats_all_time import render_stats_all_time
 
 
@@ -78,6 +72,13 @@ def render_stats_by_day():
     return render_stats_by_time(
         aggregation=st.session_state["workouts_aggregation_by_day"],
         readable_time_unit="Day",
+    )
+
+
+def render_stats_by_instructor():
+    return render_stats_by_class(
+        aggregation=st.session_state["workouts_aggregation_by_instructor"],
+        readable_class_characteristic="Instructor",
     )
 
 
