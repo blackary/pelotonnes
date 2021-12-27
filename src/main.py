@@ -6,7 +6,6 @@ import numpy as np
 import plotly.express as px
 import pandas as pd
 import streamlit as st
-from traitlets.traitlets import default
 
 
 class Aggregation(object):
@@ -180,7 +179,40 @@ def render_all_time_stats():
         st.text("Workouts have not been uploaded. See 'Upload Workouts' to the left.")
         return
 
-    st.dataframe(st.session_state["workouts_aggregation_all_time"].aggregated_df)
+    all_time_df = st.session_state["workouts_aggregation_all_time"].aggregated_df
+
+    st.text(
+        f"You have completed {all_time_df['Total Workouts'].sum()} cycling workouts with {len(st.session_state['workouts_aggregation_by_instructor'].aggregated_df)} different instructors."
+    )
+
+    total_mins = all_time_df["Total Minutes"].sum()
+    total_hrs = total_mins / 60
+    total_days = total_hrs / 24
+    total_miles = all_time_df["Total Distance"].sum()
+    st.text(
+        "You have cycled for {:.0f} minutes (that's {:.2f} hours, or {:.2f} whole days) and rode {:.2f} miles in that time.".format(
+            total_mins, total_hrs, total_days, total_miles
+        )
+    )
+
+    st.text(
+        "That makes for an all-time average speed of {:.2f} mph.".format(
+            all_time_df["Avg. Speed (mph)"].mean()
+        )
+    )
+
+    total_calories = all_time_df["Total Calories"].sum()
+    total_pizzas = total_calories / 2240
+    total_lbs_of_fat = total_calories / 3500
+    st.text(
+        "You've burned a total of {:.0f} calories in that time - that's equivalent to {:.2f} Large Pepperoni Pizzas from Domino's or {:.2f}lbs of body fat.".format(
+            total_calories, total_pizzas, total_lbs_of_fat
+        )
+    )
+
+    st.text("Keep it up!")
+
+    st.dataframe(all_time_df.T)
 
 
 def render_stats_by_month():
@@ -281,7 +313,7 @@ def render_stats_by_instructor():
             text=aggregation.aggregated_df.index,
             log_x=log_scale,
         )
-        fig.update_traces(marker_size=10)
+        fig.update_traces(marker_size=20)
         st.plotly_chart(fig)
 
     with c2:
@@ -399,7 +431,7 @@ def render_stats_by_instructor():
             y="Calories per Minute",
             text=aggregation.aggregated_df.index,
         )
-        fig.update_traces(marker_size=10)
+        fig.update_traces(marker_size=20)
         st.plotly_chart(fig)
 
     with c2:
@@ -410,23 +442,24 @@ def render_stats_by_instructor():
         
         This plot shows how hard an instructor has you working vs how fast they have you pedaling.
 
-        Instructors at the top-left have you working hard but pedaling slowly.
+        Instructors at the top-left have you working hard and pedaling slowly - usually at high resistance.
 
-        Instructors at the bottom-right have you pedaling quickly, but not working very hard.
+        Instructors at the bottom-right have you pedaling quickly but not working very hard.
         """
         )
 
 
 def render_about():
     st.title("About Pelotonnes")
-    st.markdown("Pelotonnes is a tool for visualizing your workouts.")
+    st.markdown("Pelotonnes is a tool for visualizing your cycling workouts.")
     st.markdown(
         "Pelotonnes is not associated with Peloton Interactive, Inc. "
-        + "in any way - except as fans."
+        + "- except as fans."
     )
+    st.markdown("To learn more, [message James](https://twitter.com/Jiminy_Kirket).")
     st.markdown(
-        "To learn more, or to see the source code, see "
-        + "[GitHub](https://github.com/jfkirk/pelotonnes)."
+        "To see the source code, contribute, or report an issue,"
+        + "[see GitHub](https://github.com/jfkirk/pelotonnes)."
     )
 
 
