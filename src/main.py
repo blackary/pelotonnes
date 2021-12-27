@@ -1,5 +1,4 @@
 import datetime
-import time
 from collections import defaultdict
 
 import dateparser
@@ -7,6 +6,7 @@ import numpy as np
 import plotly.express as px
 import pandas as pd
 import streamlit as st
+from traitlets.traitlets import default
 
 
 class Aggregation(object):
@@ -19,6 +19,13 @@ class Aggregation(object):
         total_distance = defaultdict(lambda: 0.0)
         total_output = defaultdict(lambda: 0.0)
         total_calories = defaultdict(lambda: 0.0)
+        total_calories_minutes = defaultdict(lambda: 0.0)
+        total_hr = defaultdict(lambda: 0.0)
+        total_hr_minutes = defaultdict(lambda: 0.0)
+        total_speed = defaultdict(lambda: 0.0)
+        total_speed_minutes = defaultdict(lambda: 0.0)
+        total_cadence = defaultdict(lambda: 0.0)
+        total_cadence_minutes = defaultdict(lambda: 0.0)
 
         for _, row in workouts_df.iterrows():
             # Get the value for the group_by column
@@ -33,14 +40,30 @@ class Aggregation(object):
 
             # Update the accumulators
             total_workouts[key] += 1
-            if not pd.isna(row["Length (minutes)"]):
-                total_time[key] += row["Length (minutes)"]
             if not pd.isna(row["Distance (mi)"]):
                 total_distance[key] += row["Distance (mi)"]
             if not pd.isna(row["Total Output"]):
                 total_output[key] += row["Total Output"]
-            if not pd.isna(row["Calories Burned"]):
-                total_calories[key] += row["Calories Burned"]
+            if not pd.isna(row["Length (minutes)"]):
+                total_time[key] += row["Length (minutes)"]
+                # These are nested inside the Length if-clause because we need to
+                # weight the values by the workout length
+                if not pd.isna(row["Calories Burned"]):
+                    total_calories[key] += row["Calories Burned"]
+                    total_calories_minutes[key] += row["Length (minutes)"]
+                if not pd.isna(row["Avg. Heartrate"]):
+                    total_hr[key] += row["Length (minutes)"] * row["Avg. Heartrate"]
+                    total_hr_minutes[key] += row["Length (minutes)"]
+                if not pd.isna(row["Avg. Speed (mph)"]):
+                    total_speed[key] += (
+                        row["Length (minutes)"] * row["Avg. Speed (mph)"]
+                    )
+                    total_speed_minutes[key] += row["Length (minutes)"]
+                if not pd.isna(row["Avg. Cadence (RPM)"]):
+                    total_cadence[key] += (
+                        row["Length (minutes)"] * row["Avg. Cadence (RPM)"]
+                    )
+                    total_cadence_minutes[key] += row["Length (minutes)"]
 
         self.aggregated_df = pd.DataFrame(
             {
@@ -50,7 +73,12 @@ class Aggregation(object):
                 "Total Output": pd.Series(total_output),
                 "Total Calories": pd.Series(total_calories),
                 "Calories per Minute": pd.Series(total_calories)
-                / pd.Series(total_time),
+                / pd.Series(total_calories_minutes),
+                "Avg. Heartrate": pd.Series(total_hr) / pd.Series(total_hr_minutes),
+                "Avg. Speed (mph)": pd.Series(total_speed)
+                / pd.Series(total_speed_minutes),
+                "Avg. Cadence (RPM)": pd.Series(total_cadence)
+                / pd.Series(total_cadence_minutes),
             }
         )
 
@@ -132,6 +160,7 @@ def render_upload_workouts():
 
     if raw_workouts is not None:
         workouts_df = pd.read_csv(raw_workouts)
+        workouts_df = workouts_df[workouts_df["Fitness Discipline"] == "Cycling"]
         st.session_state["workouts_df"] = workouts_df
 
         # Whether-or-not we've uploaded, process the DF
@@ -140,7 +169,7 @@ def render_upload_workouts():
         st.text("{} workouts processed!".format(len(workouts_df)))
 
     if "workouts_df" in st.session_state:
-        st.subheader("Workouts")
+        st.subheader("Cycling Workouts")
         st.dataframe(st.session_state["workouts_df"])
 
 
@@ -203,9 +232,35 @@ def render_stats_by_instructor():
     aggregation = st.session_state["workouts_aggregation_by_instructor"]
     st.dataframe(aggregation.aggregated_df)
 
-    c1, c2 = st.columns(2)
+    with st.expander("Visualization Options"):
+        log_scale = st.checkbox(
+            "Use logarithmic scale for cumulative statistics",
+            value=(
+                True
+                if aggregation.aggregated_df["Total Workouts"].max() >= 100
+                else False
+            ),
+        )
+        st.text(
+            "Use logarithmic scale if you have a large number of workouts with your "
+            + "top instructors and few workouts with others."
+        )
 
+    c1, c2 = st.columns(2)
     with c1:
+        st.subheader("Total Minutes")
+        sorted_minutes = aggregation.aggregated_df["Total Minutes"].sort_values(
+            ascending=False
+        )
+        fig = px.bar(
+            sorted_minutes,
+            labels={"index": "Instructor", "value": "Total Minutes"},
+            log_y=log_scale,
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
+
+    with c2:
         st.subheader("Calories per Minute")
         sorted_cpm = aggregation.aggregated_df["Calories per Minute"].sort_values(
             ascending=False
@@ -213,69 +268,161 @@ def render_stats_by_instructor():
         fig = px.bar(
             sorted_cpm, labels={"index": "Instructor", "value": "Calories per Minute"}
         )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.subheader("Calories per Minute vs Total Minutes")
+        fig = px.scatter(
+            aggregation.aggregated_df,
+            x="Total Minutes",
+            y="Calories per Minute",
+            text=aggregation.aggregated_df.index,
+            log_x=log_scale,
+        )
+        fig.update_traces(marker_size=10)
         st.plotly_chart(fig)
 
     with c2:
-        st.subheader("Total Minutes")
-        sorted_minutes = aggregation.aggregated_df["Total Minutes"].sort_values(
-            ascending=False
+        st.subheader("")
+        st.markdown(
+            """
+        **Note:**
+        
+        This plot shows which instructors you spend the most time with vs how hard you work in their workouts. 
+        
+        Instructors in the top-left make you work hard, but you have not spent much time with them.
+
+        Instructors in the bottom-right are ones you spend a lot of time with, but don't push you as hard.
+        """
+        )
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.subheader("Total Output")
+        sorted_output = (
+            aggregation.aggregated_df["Total Output"]
+            .sort_values(ascending=False)
+            .dropna()
         )
         fig = px.bar(
-            sorted_minutes, labels={"index": "Instructor", "value": "Total Minutes"}
+            sorted_output,
+            labels={"index": "Instructor", "value": "Total Output"},
+            log_y=log_scale,
         )
+        fig.update_layout(showlegend=False)
         st.plotly_chart(fig)
 
-    st.subheader("Calories per Minute vs Total Minutes")
-    fig = px.scatter(
-        aggregation.aggregated_df,
-        x="Total Minutes",
-        y="Calories per Minute",
-        text=aggregation.aggregated_df.index,
-    )
-    fig.update_traces(marker_size=10)
-    st.plotly_chart(fig)
+    with c2:
+        st.subheader("Total Workouts")
+        sorted_workouts = (
+            aggregation.aggregated_df["Total Workouts"]
+            .sort_values(ascending=False)
+            .dropna()
+        )
+        fig = px.bar(
+            sorted_workouts,
+            labels={"index": "Instructor", "value": "Total Workouts"},
+            log_y=log_scale,
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
 
-    st.subheader("Total Workouts")
-    sorted_workouts = aggregation.aggregated_df["Total Workouts"].sort_values(
-        ascending=False
-    )
-    fig = px.bar(
-        sorted_workouts, labels={"index": "Instructor", "value": "Total Workouts"}
-    )
-    st.plotly_chart(fig)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.subheader("Total Calories")
+        sorted_calories = (
+            aggregation.aggregated_df["Total Calories"]
+            .sort_values(ascending=False)
+            .dropna()
+        )
+        fig = px.bar(
+            sorted_calories,
+            labels={"index": "Instructor", "value": "Total Calories"},
+            log_y=log_scale,
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
 
-    st.subheader("Total Output")
-    sorted_output = aggregation.aggregated_df["Total Output"].sort_values(
-        ascending=False
-    )
-    fig = px.bar(sorted_output, labels={"index": "Instructor", "value": "Total Output"})
-    st.plotly_chart(fig)
+    with c2:
+        st.subheader("Total Distance")
+        sorted_distance = (
+            aggregation.aggregated_df["Total Distance"]
+            .sort_values(ascending=False)
+            .dropna()
+        )
+        fig = px.bar(
+            sorted_distance,
+            labels={"index": "Instructor", "value": "Total Distance"},
+            log_y=log_scale,
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
 
-    st.subheader("Total Calories")
-    sorted_calories = aggregation.aggregated_df["Total Calories"].sort_values(
-        ascending=False
-    )
-    fig = px.bar(
-        sorted_calories, labels={"index": "Instructor", "value": "Total Calories"}
-    )
-    st.plotly_chart(fig)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.subheader("Avg. Heartrate")
+        sorted_calories = (
+            aggregation.aggregated_df["Avg. Heartrate"]
+            .sort_values(ascending=False)
+            .dropna()
+        )
+        fig = px.bar(
+            sorted_calories,
+            labels={"index": "Instructor", "value": "Avg. Heartrate"},
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
 
-    st.subheader("Total Distance")
-    sorted_distance = aggregation.aggregated_df["Total Distance"].sort_values(
-        ascending=False
-    )
-    fig = px.bar(
-        sorted_distance, labels={"index": "Instructor", "value": "Total Distance"}
-    )
-    st.plotly_chart(fig)
+    with c2:
+        st.subheader("Avg. Speed (mph)")
+        sorted_distance = (
+            aggregation.aggregated_df["Avg. Speed (mph)"]
+            .sort_values(ascending=False)
+            .dropna()
+        )
+        fig = px.bar(
+            sorted_distance,
+            labels={"index": "Instructor", "value": "Avg. Speed (mph)"},
+            log_y=log_scale,
+        )
+        fig.update_layout(showlegend=False)
+        st.plotly_chart(fig)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.subheader("Calories per Minute vs Avg. Cadence (RPM)")
+        fig = px.scatter(
+            aggregation.aggregated_df,
+            x="Avg. Cadence (RPM)",
+            y="Calories per Minute",
+            text=aggregation.aggregated_df.index,
+        )
+        fig.update_traces(marker_size=10)
+        st.plotly_chart(fig)
+
+    with c2:
+        st.subheader("")
+        st.markdown(
+            """
+        **Note:**
+        
+        This plot shows how hard an instructor has you working vs how fast they have you pedaling.
+
+        Instructors at the top-left have you working hard but pedaling slowly.
+
+        Instructors at the bottom-right have you pedaling quickly, but not working very hard.
+        """
+        )
 
 
 def render_about():
     st.title("About Pelotonnes")
     st.markdown("Pelotonnes is a tool for visualizing your workouts.")
     st.markdown(
-        "Pelotonnes is not associated with Peloton Interactive, Inc. in any way - except"
-        + " as fans."
+        "Pelotonnes is not associated with Peloton Interactive, Inc. "
+        + "in any way - except as fans."
     )
     st.markdown(
         "To learn more, or to see the source code, see "
@@ -290,8 +437,8 @@ def main():
     pages = {
         "Upload Workouts": render_upload_workouts,
         "All-Time Stats": render_all_time_stats,
-        "Stats By Month": render_stats_by_month,
         "Stats By Instructor": render_stats_by_instructor,
+        "Stats By Month": render_stats_by_month,
         "About": render_about,
     }
     app_mode = st.sidebar.radio("Tools", options=pages.keys())
