@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import streamlit_analytics as sta
 
 from aggregation import process_workouts_df
 from render_stats_by_time import render_stats_by_time
@@ -112,26 +113,27 @@ def render_about():
 
 
 def main():
-    st.set_page_config(page_title="Pelotonnes", layout="wide")
-    st.sidebar.title("Pelotonnes")
+    with sta.track():
+        st.set_page_config(page_title="Pelotonnes", layout="wide")
+        st.sidebar.title("Pelotonnes")
 
-    pages = {
-        "Upload Workouts": render_upload_workouts,
-        "All-Time Stats": render_stats_all_time,
-        "Stats By Instructor": render_stats_by_instructor,
-        "Stats By Class Type": render_stats_by_class_type,
-        "Stats By Class Length": render_stats_by_class_length,
-        "Stats By Year": render_stats_by_year,
-        "Stats By Month": render_stats_by_month,
-        "Stats By Week": render_stats_by_week,
-        "Stats By Day": render_stats_by_day,
-        "About": render_about,
-    }
-    app_mode = st.sidebar.radio("Tools", options=pages.keys())
-    st.session_state["app_mode"] = app_mode
+        pages = {
+            "Upload Workouts": render_upload_workouts,
+            "All-Time Stats": render_stats_all_time,
+            "Stats By Instructor": render_stats_by_instructor,
+            "Stats By Class Type": render_stats_by_class_type,
+            "Stats By Class Length": render_stats_by_class_length,
+            "Stats By Year": render_stats_by_year,
+            "Stats By Month": render_stats_by_month,
+            "Stats By Week": render_stats_by_week,
+            "Stats By Day": render_stats_by_day,
+            "About": render_about,
+        }
+        app_mode = st.sidebar.radio("Tools", options=pages.keys())
+        st.session_state["app_mode"] = app_mode
 
-    # Render the selected page
-    pages[app_mode]()
+        # Render the selected page
+        pages[app_mode]()
 
 
 main()
