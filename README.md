@@ -1,6 +1,6 @@
 # Pelotonnes
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/jfkirk/pelotonnes/main/src/main.py)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pelotonnes.com)
 
 Pelotonnes is a tool for visualizing your cycling workouts using Streamlit.
 
