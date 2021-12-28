@@ -15,8 +15,13 @@ def render_stats_all_time():
 
     st.dataframe(st.session_state["workouts_aggregation_all_time"].styled_aggregated_df)
 
+    n_workouts = all_time_df["Total Workouts"].sum()
+    n_instructors = len(
+        st.session_state["workouts_aggregation_by_instructor"].aggregated_df
+    )
     st.markdown(
-        f"You have completed **{all_time_df['Total Workouts'].sum()}** cycling workouts with **{len(st.session_state['workouts_aggregation_by_instructor'].aggregated_df)}** different instructors."
+        f"You have completed **{n_workouts}** cycling workouts"
+        + f" with **{n_instructors}** different instructors."
     )
 
     total_mins = all_time_df["Total Minutes"].sum()
@@ -24,7 +29,11 @@ def render_stats_all_time():
     total_days = total_hrs / 24
     total_miles = all_time_df["Total Distance"].sum()
     st.markdown(
-        "You have cycled for **{:.0f}** minutes (that's **{:.2f}** hours, or **{:.2f}** whole days) and rode **{:.2f}** miles in that time at an all-time average speed of **{:.2f}** mph.".format(
+        (
+            "You have cycled for **{:.0f}** minutes (that's **{:.2f}** hours, or "
+            + "**{:.2f}** whole days) and rode **{:.2f}** miles in that time at an"
+            + " all-time average speed of **{:.2f}** mph."
+        ).format(
             total_mins,
             total_hrs,
             total_days,
@@ -58,9 +67,10 @@ def render_stats_all_time():
     total_output = all_time_df["Total Output"].sum()
     total_calories = all_time_df["Total Calories"].sum()
     st.markdown(
-        "You've output a total of **{:.0f}** kilojoules and burned a total of **{:.0f}** kilocalories in that time.".format(
-            total_output, total_calories
-        )
+        (
+            "You've output a total of **{:.0f}** kilojoules and burned a total of"
+            + " **{:.0f}** kilocalories in that time."
+        ).format(total_output, total_calories)
     )
 
     total_pizzas = total_calories / 2240

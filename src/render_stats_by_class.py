@@ -25,7 +25,8 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             ),
         )
         st.markdown(
-            "Use a logarithmic scale if you have a large number of workouts of some types and few workouts of other types."
+            "Use a logarithmic scale if you have a large number of workouts of some "
+            + "types and very few workouts of other types."
         )
 
     # When slicing by Instructor, this helps visualize without as much crowding
@@ -55,13 +56,18 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
         with c2:
             st.subheader("Output per Minute vs Total Minutes")
             st.markdown(
-                """
-            This plot shows which classes you spend the most time in vs how hard you work in those workouts. 
-            
-            Classes in the top-left make you work hard, but you have not spent much time in them. Maybe try them out some more!
+                "This plot shows which classes you spend the most time in vs how hard"
+                + " you work in those workouts. "
+            )
+            st.markdown(
+                "Classes in the top-left make you work hard, but you have not spent "
+                + "much time in them. Maybe try them out some more!"
+            )
 
-            Classes in the bottom-right are ones you spend a lot of time in, but don't push you as hard. You may want to phase these out of your routines.
-            """
+            st.markdown(
+                "Classes in the bottom-right are ones you spend a lot of time in, but "
+                + "don't push you as hard. You may want to phase these out of your "
+                + "routines."
             )
 
         c1, c2 = st.columns([3, 2])
@@ -82,13 +88,16 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
         with c2:
             st.subheader("Avg. Resistance vs Avg. Cadence (RPM)")
             st.markdown(
-                """
-            This plot shows how hard you work in a class vs how fast you pedal in it.
-
-            Classes at the top-left get you pedaling slowly and working hard at a high resistance - good for putting the work in.
-
-            Classes at the bottom-right get you pedaling quickly but working at a low resistance - good for stretching your legs.
-            """
+                "This plot shows how hard you work in a class vs how fast you pedal "
+                + "in it."
+            )
+            st.markdown(
+                "Classes at the top-left get you pedaling slowly and working hard at a "
+                + "high resistance - good for putting the work in."
+            )
+            st.markdown(
+                "Classes at the bottom-right get you pedaling quickly but working at "
+                + "a low resistance - good for stretching your legs."
             )
 
         c1, c2 = st.columns(2)
