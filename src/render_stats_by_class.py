@@ -7,7 +7,7 @@ from aggregation import Aggregation
 def render_stats_by_class(aggregation: Aggregation, readable_class_characteristic: str):
     st.title("Stats By {}".format(readable_class_characteristic))
 
-    if "workouts_df" not in st.session_state:
+    if aggregation is None:
         st.markdown(
             "Workouts have not been uploaded. See 'Upload Workouts' to the left."
         )
@@ -28,23 +28,29 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             "Use a logarithmic scale if you have a large number of workouts of some types and few workouts of other types."
         )
 
+    # When slicing by Instructor, this helps visualize without as much crowding
+    scatter_text = aggregation.aggregated_df.index.to_series()
+    if readable_class_characteristic == "Instructor":
+        scatter_text = scatter_text.apply(lambda x: x.split(" ")[0])
+
     with st.expander("Visualize Output and Performance", expanded=True):
 
-        c1, c2 = st.columns(2)
+        c1, c2 = st.columns([3, 2])
         with c1:
             fig = px.scatter(
                 aggregation.aggregated_df,
                 x="Total Minutes",
                 y="Output per Minute",
-                text=aggregation.aggregated_df.index,
+                text=scatter_text,
                 log_x=log_scale,
             )
             fig.update_xaxes(showgrid=False)
             fig.update_yaxes(showgrid=False)
             fig.update_layout(
-                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
             )
-            fig.update_traces(marker_size=20)
+            fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
             st.subheader("Output per Minute vs Total Minutes")
@@ -52,36 +58,36 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 """
             This plot shows which classes you spend the most time in vs how hard you work in those workouts. 
             
-            Classes in the top-left make you work hard, but you have not spent much time in them.
+            Classes in the top-left make you work hard, but you have not spent much time in them. Maybe try them out some more!
 
-            Classes in the bottom-right are ones you spend a lot of time in, but don't push you as hard.
+            Classes in the bottom-right are ones you spend a lot of time in, but don't push you as hard. You may want to phase these out of your routines.
             """
             )
 
-        c1, c2 = st.columns(2)
+        c1, c2 = st.columns([3, 2])
         with c1:
             fig = px.scatter(
                 aggregation.aggregated_df,
                 x="Avg. Cadence (RPM)",
-                y="Output per Minute",
-                text=aggregation.aggregated_df.index,
+                y="Avg. Resistance",
+                text=scatter_text,
             )
             fig.update_xaxes(showgrid=False)
             fig.update_yaxes(showgrid=False)
             fig.update_layout(
                 plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
-            fig.update_traces(marker_size=20)
+            fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
-            st.subheader("Output per Minute vs Avg. Cadence (RPM)")
+            st.subheader("Avg. Resistance vs Avg. Cadence (RPM)")
             st.markdown(
                 """
             This plot shows how hard you work in a class vs how fast you pedal in it.
 
-            Classes at the top-left get you working hard and pedaling slowly - usually at high resistance.
+            Classes at the top-left get you pedaling slowly and working hard at a high resistance - good for putting the work in.
 
-            Classes at the bottom-right get you pedaling your quickest but not working very hard.
+            Classes at the bottom-right get you pedaling quickly but working at a low resistance - good for stretching your legs.
             """
             )
 
@@ -92,7 +98,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 title="Calories per Minute vs Total Minutes",
                 x="Total Minutes",
                 y="Calories per Minute",
-                text=aggregation.aggregated_df.index,
+                text=scatter_text,
                 log_x=log_scale,
             )
             fig.update_xaxes(showgrid=False)
@@ -100,7 +106,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig.update_layout(
                 plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
-            fig.update_traces(marker_size=20)
+            fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
             fig = px.scatter(
@@ -108,7 +114,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                 title="Calories per Minute vs Avg. Cadence (RPM)",
                 x="Avg. Cadence (RPM)",
                 y="Calories per Minute",
-                text=aggregation.aggregated_df.index,
+                text=scatter_text,
                 log_x=log_scale,
             )
             fig.update_xaxes(showgrid=False)
@@ -116,7 +122,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig.update_layout(
                 plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
             )
-            fig.update_traces(marker_size=20)
+            fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
 
         c1, c2 = st.columns(2)
@@ -197,6 +203,52 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
                     "index": readable_class_characteristic,
                     "value": "Avg. Heartrate",
                 },
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
+            fig.update_layout(showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            sorted_resistance = (
+                aggregation.aggregated_df["Avg. Resistance"]
+                .sort_values(ascending=False)
+                .dropna()
+            )
+            fig = px.bar(
+                sorted_resistance,
+                title="Avg. Resistance (%) by {}".format(readable_class_characteristic),
+                labels={
+                    "index": readable_class_characteristic,
+                    "value": "Avg. Resistance (%)",
+                },
+                log_y=log_scale,
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
+            fig.update_layout(showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+        with c2:
+            sorted_cadence = (
+                aggregation.aggregated_df["Avg. Cadence (RPM)"]
+                .sort_values(ascending=False)
+                .dropna()
+            )
+            fig = px.bar(
+                sorted_cadence,
+                title="Avg. Cadence (RPM) by {}".format(readable_class_characteristic),
+                labels={
+                    "index": readable_class_characteristic,
+                    "value": "Avg. Cadence (RPM)",
+                },
+                log_y=log_scale,
             )
             fig.update_xaxes(showgrid=False)
             fig.update_yaxes(showgrid=False)

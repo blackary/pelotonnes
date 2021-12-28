@@ -49,49 +49,49 @@ def render_upload_workouts():
 
 def render_stats_by_year():
     return render_stats_by_time(
-        aggregation=st.session_state["workouts_aggregation_by_year"],
+        aggregation=st.session_state.get("workouts_aggregation_by_year", None),
         readable_time_unit="Year",
     )
 
 
 def render_stats_by_month():
     return render_stats_by_time(
-        aggregation=st.session_state["workouts_aggregation_by_month"],
+        aggregation=st.session_state.get("workouts_aggregation_by_month", None),
         readable_time_unit="Month",
     )
 
 
 def render_stats_by_week():
     return render_stats_by_time(
-        aggregation=st.session_state["workouts_aggregation_by_week"],
+        aggregation=st.session_state.get("workouts_aggregation_by_week", None),
         readable_time_unit="Week",
     )
 
 
 def render_stats_by_day():
     return render_stats_by_time(
-        aggregation=st.session_state["workouts_aggregation_by_day"],
+        aggregation=st.session_state.get("workouts_aggregation_by_day", None),
         readable_time_unit="Day",
     )
 
 
 def render_stats_by_instructor():
     return render_stats_by_class(
-        aggregation=st.session_state["workouts_aggregation_by_instructor"],
+        aggregation=st.session_state.get("workouts_aggregation_by_instructor", None),
         readable_class_characteristic="Instructor",
     )
 
 
 def render_stats_by_class_type():
     return render_stats_by_class(
-        aggregation=st.session_state["workouts_aggregation_by_class_type"],
+        aggregation=st.session_state.get("workouts_aggregation_by_class_type", None),
         readable_class_characteristic="Class Type",
     )
 
 
 def render_stats_by_class_length():
     return render_stats_by_class(
-        aggregation=st.session_state["workouts_aggregation_by_class_length"],
+        aggregation=st.session_state.get("workouts_aggregation_by_class_length", None),
         readable_class_characteristic="Class Length",
     )
 

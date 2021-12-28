@@ -13,6 +13,8 @@ def render_stats_all_time():
     workouts_df = st.session_state["workouts_df"]
     all_time_df = st.session_state["workouts_aggregation_all_time"].aggregated_df
 
+    st.dataframe(st.session_state["workouts_aggregation_all_time"].styled_aggregated_df)
+
     st.markdown(
         f"You have completed **{all_time_df['Total Workouts'].sum()}** cycling workouts with **{len(st.session_state['workouts_aggregation_by_instructor'].aggregated_df)}** different instructors."
     )
@@ -22,14 +24,26 @@ def render_stats_all_time():
     total_days = total_hrs / 24
     total_miles = all_time_df["Total Distance"].sum()
     st.markdown(
-        "You have cycled for **{:.0f}** minutes (that's **{:.2f}** hours, or **{:.2f}** whole days) and rode **{:.2f}** miles in that time.".format(
-            total_mins, total_hrs, total_days, total_miles
+        "You have cycled for **{:.0f}** minutes (that's **{:.2f}** hours, or **{:.2f}** whole days) and rode **{:.2f}** miles in that time at an all-time average speed of **{:.2f}** mph.".format(
+            total_mins,
+            total_hrs,
+            total_days,
+            total_miles,
+            all_time_df["Avg. Speed (mph)"].mean(),
         )
     )
 
+    total_london_to_paris = total_miles / 300
+    total_across_usa = total_miles / 3700
+    total_to_moon = total_miles / 240000
     st.markdown(
-        "That makes for an all-time average speed of **{:.2f}** mph.".format(
-            all_time_df["Avg. Speed (mph)"].mean()
+        """
+    That's approximately:
+    - **{:.2f}** Chunnel rides from London to Paris.
+    - **{:.2f}** Great American Rail Trail rides across the USA.
+    - **{:.2f}** Apollo 11 rides to the Moon.
+    """.format(
+            total_london_to_paris, total_across_usa, total_to_moon
         )
     )
 
@@ -41,15 +55,26 @@ def render_stats_all_time():
         )
     )
 
+    total_output = all_time_df["Total Output"].sum()
     total_calories = all_time_df["Total Calories"].sum()
-    total_pizzas = total_calories / 2240
-    total_lbs_of_fat = total_calories / 3500
     st.markdown(
-        "You've burned a total of **{:.0f}** calories in that time - that's equivalent to **{:.2f}** Large Pepperoni Pizzas from Domino's or **{:.2f}lbs** of body fat.".format(
-            total_calories, total_pizzas, total_lbs_of_fat
+        "You've output a total of **{:.0f}** kilojoules and burned a total of **{:.0f}** kilocalories in that time.".format(
+            total_output, total_calories
         )
     )
 
-    st.markdown("Keep it up!")
+    total_pizzas = total_calories / 2240
+    total_lbs_of_fat = total_calories / 3500
+    total_gallons_of_gasoline = total_output / 131760
+    st.markdown(
+        """
+    That's approximately:
+    - **{:.2f}** Large Pepperoni Pizzas from Domino's in kilocalories.
+    - **{:.2f}** pounds of pure body fat in kilocalories.
+    - **{:.2f}** gallons of gasoline in kilojoules.
+    """.format(
+            total_pizzas, total_lbs_of_fat, total_gallons_of_gasoline
+        )
+    )
 
-    st.dataframe(st.session_state["workouts_aggregation_all_time"].styled_aggregated_df)
+    st.markdown("**Keep it up!**")

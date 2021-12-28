@@ -76,6 +76,8 @@ class Aggregation(object):
         total_speed_minutes = defaultdict(lambda: 0.0)
         total_cadence = defaultdict(lambda: 0.0)
         total_cadence_minutes = defaultdict(lambda: 0.0)
+        total_resistance = defaultdict(lambda: 0.0)
+        total_resistance_minutes = defaultdict(lambda: 0.0)
 
         for _, row in workouts_df.iterrows():
             # Get the value for the group_by column
@@ -95,7 +97,8 @@ class Aggregation(object):
             if not pd.isna(row["Length (minutes)"]):
                 total_time[key] += row["Length (minutes)"]
                 # These are nested inside the Length if-clause because we need to
-                # weight the values by the workout length
+                # weight the values by the workout length. Nominally, length is never
+                # missing.
                 if not pd.isna(row["Total Output"]):
                     total_output[key] += row["Total Output"]
                     total_output_minutes[key] += row["Length (minutes)"]
@@ -115,6 +118,11 @@ class Aggregation(object):
                         row["Length (minutes)"] * row["Avg. Cadence (RPM)"]
                     )
                     total_cadence_minutes[key] += row["Length (minutes)"]
+                if not pd.isna(row["Avg. Resistance"]):
+                    total_resistance[key] += row["Length (minutes)"] * float(
+                        row["Avg. Resistance"].strip("%")
+                    )
+                    total_resistance_minutes[key] += row["Length (minutes)"]
 
         self.aggregated_df = pd.DataFrame(
             {
@@ -132,6 +140,8 @@ class Aggregation(object):
                 / pd.Series(total_speed_minutes),
                 "Avg. Cadence (RPM)": pd.Series(total_cadence)
                 / pd.Series(total_cadence_minutes),
+                "Avg. Resistance": pd.Series(total_resistance)
+                / pd.Series(total_resistance_minutes),
             }
         ).sort_index()
         self.styled_aggregated_df = self.aggregated_df.style.format(
