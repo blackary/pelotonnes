@@ -19,9 +19,13 @@ def render_stats_all_time():
     n_instructors = len(
         st.session_state["workouts_aggregation_by_instructor"].aggregated_df
     )
+    n_live = len(workouts_df[workouts_df["Live/On-Demand"] == "Live"])
+    n_on_demand = len(workouts_df[workouts_df["Live/On-Demand"] == "On Demand"])
     st.markdown(
         f"You have completed **{n_workouts}** cycling workouts"
-        + f" with **{n_instructors}** different instructors."
+        + f" with **{n_instructors}** different instructors. "
+        + f"You have completed **{n_live}** live workouts and **{n_on_demand}** "
+        + "on-demand workouts."
     )
 
     total_mins = all_time_df["Total Minutes"].sum()
@@ -56,14 +60,6 @@ def render_stats_all_time():
         )
     )
 
-    n_live = len(workouts_df[workouts_df["Live/On-Demand"] == "Live"])
-    n_on_demand = len(workouts_df[workouts_df["Live/On-Demand"] == "On Demand"])
-    st.markdown(
-        "You have completed **{}** live workouts and **{}** on-demand workouts.".format(
-            n_live, n_on_demand
-        )
-    )
-
     total_output = all_time_df["Total Output"].sum()
     total_calories = all_time_df["Total Calories"].sum()
     st.markdown(
@@ -73,17 +69,19 @@ def render_stats_all_time():
         ).format(total_output, total_calories)
     )
 
-    total_pizzas = total_calories / 2240
     total_lbs_of_fat = total_calories / 3500
-    total_gallons_of_gasoline = total_output / 131760
+    total_iphone_years = total_output / 13000
+    total_kg_to_orbit = total_output / 63000
+    total_home_days = total_output / 105682
     st.markdown(
         """
     That's approximately:
-    - **{:.2f}** Large Pepperoni Pizzas from Domino's in kilocalories.
     - **{:.2f}** pounds of pure body fat in kilocalories.
-    - **{:.2f}** gallons of gasoline in kilojoules.
+    - Enough energy to power an iPhone for **{:.2f}** years.
+    - **{:.2f}**x the energy to accelerate 1kg to escape velocity from Earth.
+    - Enough energy to power the average American home for **{:.2f}** days.
     """.format(
-            total_pizzas, total_lbs_of_fat, total_gallons_of_gasoline
+            total_lbs_of_fat, total_iphone_years, total_kg_to_orbit, total_home_days
         )
     )
 
