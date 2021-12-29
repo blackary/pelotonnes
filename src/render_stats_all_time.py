@@ -47,16 +47,24 @@ def render_stats_all_time():
     )
 
     total_london_to_paris = total_miles / 300
+    total_pacific_coast = total_miles / 1857.6
+    total_tour_de_france = total_miles / 2121.6
     total_across_usa = total_miles / 3700
     total_to_moon = total_miles / 240000
     st.markdown(
         """
     That's approximately:
     - **{:.2f}** Chunnel rides from London to Paris.
+    - **{:.2f}** Pacific Coast Bike Route rides from Vancouver to Imperial Beach.
+    - **{:.2f}** Tours de France.
     - **{:.2f}** Great American Rail Trail rides across the USA.
     - **{:.2f}** Apollo 11 rides to the Moon.
     """.format(
-            total_london_to_paris, total_across_usa, total_to_moon
+            total_london_to_paris,
+            total_pacific_coast,
+            total_tour_de_france,
+            total_across_usa,
+            total_to_moon,
         )
     )
 
