@@ -6,6 +6,24 @@ import pandas as pd
 import streamlit as st
 
 
+def datetime_to_day_index(datetime_obj):
+    return datetime_obj.date()
+
+
+def datetime_to_week_index(datetime_obj):
+    return datetime.datetime.strptime(
+        "{}-{}-1".format(datetime_obj.year, datetime_obj.isocalendar()[1]), "%Y-%W-%w"
+    ).date()
+
+
+def datetime_to_month_index(datetime_obj):
+    return datetime_obj.strftime("%Y-%m")
+
+
+def datetime_to_year_index(datetime_obj):
+    return datetime_obj.year
+
+
 def process_workouts_df():
     # Bail out if we don't have a workouts_df on the session_state
     if "workouts_df" not in st.session_state:
@@ -23,30 +41,30 @@ def process_workouts_df():
         lambda x: parse_datetime(x)
     )
     workouts_df["c_datetime"] = pd.to_datetime(workouts_df["c_datetime"], utc=True)
-    workouts_df["c_day"] = workouts_df["c_datetime"].apply(lambda x: x.date())
-    workouts_df["c_week"] = workouts_df["c_datetime"].apply(
-        lambda x: datetime.datetime.strptime(
-            "{}-{}-1".format(x.year, x.isocalendar()[1]), "%Y-%W-%w"
-        ).date()
+    workouts_df["c_day"] = workouts_df["c_datetime"].apply(datetime_to_day_index)
+    workouts_df["c_week"] = workouts_df["c_datetime"].apply(datetime_to_week_index)
+    workouts_df["c_month"] = workouts_df["c_datetime"].apply(datetime_to_month_index)
+    workouts_df["c_year"] = workouts_df["c_datetime"].apply(datetime_to_year_index)
+
+    date_range = pd.Series(
+        pd.date_range(start=workouts_df["c_day"].min(), end=workouts_df["c_day"].max())
     )
-    workouts_df["c_month"] = workouts_df["c_datetime"].apply(
-        lambda x: x.strftime("%Y-%m")
-    )
-    workouts_df["c_year"] = workouts_df["c_datetime"].apply(lambda x: int(x.year))
 
     # After processing, reassign the processed DF to session_state
     st.session_state["workouts_df"] = workouts_df
     st.session_state["workouts_aggregation_all_time"] = Aggregation(workouts_df)
     st.session_state["workouts_aggregation_by_year"] = Aggregation(
-        workouts_df, "c_year"
+        workouts_df, "c_year", extra_indices=date_range.apply(datetime_to_year_index)
     )
     st.session_state["workouts_aggregation_by_month"] = Aggregation(
-        workouts_df, "c_month"
+        workouts_df, "c_month", extra_indices=date_range.apply(datetime_to_month_index)
     )
     st.session_state["workouts_aggregation_by_week"] = Aggregation(
-        workouts_df, "c_week"
+        workouts_df, "c_week", extra_indices=date_range.apply(datetime_to_week_index)
     )
-    st.session_state["workouts_aggregation_by_day"] = Aggregation(workouts_df, "c_day")
+    st.session_state["workouts_aggregation_by_day"] = Aggregation(
+        workouts_df, "c_day", extra_indices=date_range.apply(datetime_to_day_index)
+    )
     st.session_state["workouts_aggregation_by_instructor"] = Aggregation(
         workouts_df, "Instructor Name"
     )
@@ -59,7 +77,12 @@ def process_workouts_df():
 
 
 class Aggregation(object):
-    def __init__(self, workouts_df, group_by=None):
+    def __init__(
+        self,
+        workouts_df,
+        group_by=None,
+        extra_indices=None,
+    ):
         self.group_by = group_by
 
         # These accumulators hold the values over the iterations
@@ -78,6 +101,24 @@ class Aggregation(object):
         total_cadence_minutes = defaultdict(lambda: 0.0)
         total_resistance = defaultdict(lambda: 0.0)
         total_resistance_minutes = defaultdict(lambda: 0.0)
+
+        if extra_indices is not None:
+            for index in extra_indices:
+                total_workouts[index] = 0
+                total_time[index] = 0.0
+                total_distance[index] = 0.0
+                total_output[index] = 0.0
+                total_output_minutes[index] = 0.0
+                total_calories[index] = 0.0
+                total_calories_minutes[index] = 0.0
+                total_hr[index] = 0.0
+                total_hr_minutes[index] = 0.0
+                total_speed[index] = 0.0
+                total_speed_minutes[index] = 0.0
+                total_cadence[index] = 0.0
+                total_cadence_minutes[index] = 0.0
+                total_resistance[index] = 0.0
+                total_resistance_minutes[index] = 0.0
 
         for _, row in workouts_df.iterrows():
             # Get the value for the group_by column
