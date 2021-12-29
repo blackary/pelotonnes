@@ -77,19 +77,19 @@ def render_stats_all_time():
         ).format(total_output, total_calories)
     )
 
+    total_iphone_years = total_output / 35.6
     total_lbs_of_fat = total_calories / 3500
-    total_iphone_years = total_output / 13000
     total_kg_to_orbit = total_output / 63000
     total_home_days = total_output / 105682
     st.markdown(
         """
     That's approximately:
+    - Enough energy to power an iPhone for **{:.0f}** days.
     - **{:.2f}** pounds of pure body fat in kilocalories.
-    - Enough energy to power an iPhone for **{:.2f}** years.
     - **{:.2f}**x the energy to accelerate 1kg to escape velocity from Earth.
     - Enough energy to power the average American home for **{:.2f}** days.
     """.format(
-            total_lbs_of_fat, total_iphone_years, total_kg_to_orbit, total_home_days
+            total_iphone_years, total_lbs_of_fat, total_kg_to_orbit, total_home_days
         )
     )
 
