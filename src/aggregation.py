@@ -135,35 +135,39 @@ class Aggregation(object):
             total_workouts[key] += 1
             if not pd.isna(row["Distance (mi)"]):
                 total_distance[key] += row["Distance (mi)"]
-            if not pd.isna(row["Length (minutes)"]):
-                total_time[key] += row["Length (minutes)"]
+
+            duration = None
+            if not pd.isna(row["Length (minutes)"]) and (
+                row["Length (minutes)"] != "None"
+            ):
+                duration = int(row["Length (minutes)"])
+            elif row["Length (minutes)"] == "None":
+                duration = (row["Distance (mi)"] / row["Avg. Speed (mph)"]) * 60
+
+            if duration is not None:
+                total_time[key] += duration
                 # These are nested inside the Length if-clause because we need to
-                # weight the values by the workout length. Nominally, length is never
-                # missing.
+                # weight the values by the workout length. Length is missing for scenic rides.
                 if not pd.isna(row["Total Output"]):
                     total_output[key] += row["Total Output"]
-                    total_output_minutes[key] += row["Length (minutes)"]
+                    total_output_minutes[key] += duration
                 if not pd.isna(row["Calories Burned"]):
                     total_calories[key] += row["Calories Burned"]
-                    total_calories_minutes[key] += row["Length (minutes)"]
+                    total_calories_minutes[key] += duration
                 if not pd.isna(row["Avg. Heartrate"]):
-                    total_hr[key] += row["Length (minutes)"] * row["Avg. Heartrate"]
-                    total_hr_minutes[key] += row["Length (minutes)"]
+                    total_hr[key] += duration * row["Avg. Heartrate"]
+                    total_hr_minutes[key] += duration
                 if not pd.isna(row["Avg. Speed (mph)"]):
-                    total_speed[key] += (
-                        row["Length (minutes)"] * row["Avg. Speed (mph)"]
-                    )
-                    total_speed_minutes[key] += row["Length (minutes)"]
+                    total_speed[key] += duration * row["Avg. Speed (mph)"]
+                    total_speed_minutes[key] += duration
                 if not pd.isna(row["Avg. Cadence (RPM)"]):
-                    total_cadence[key] += (
-                        row["Length (minutes)"] * row["Avg. Cadence (RPM)"]
-                    )
-                    total_cadence_minutes[key] += row["Length (minutes)"]
+                    total_cadence[key] += duration * row["Avg. Cadence (RPM)"]
+                    total_cadence_minutes[key] += duration
                 if not pd.isna(row["Avg. Resistance"]):
-                    total_resistance[key] += row["Length (minutes)"] * float(
+                    total_resistance[key] += duration * float(
                         row["Avg. Resistance"].strip("%")
                     )
-                    total_resistance_minutes[key] += row["Length (minutes)"]
+                    total_resistance_minutes[key] += duration
 
         self.aggregated_df = pd.DataFrame(
             {
