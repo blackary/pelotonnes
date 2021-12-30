@@ -41,7 +41,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig = px.scatter(
                 aggregation.aggregated_df,
                 x="Total Minutes",
-                y="Output per Minute",
+                y="Output (watts)",
                 text=scatter_text,
                 log_x=log_scale,
             )
@@ -54,7 +54,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
-            st.subheader("Output per Minute vs Total Minutes")
+            st.subheader("Output (watts) vs Total Minutes")
             st.markdown(
                 "This plot shows which classes you spend the most time in vs how hard"
                 + " you work in those workouts. "
@@ -86,7 +86,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
-            st.subheader("Avg. Resistance vs Avg. Cadence (RPM)")
+            st.subheader("Avg. Resistance (%) vs Avg. Cadence (RPM)")
             st.markdown(
                 "This plot shows how hard you work in a class vs how fast you pedal "
                 + "in it."
@@ -136,15 +136,15 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            sorted_opm = aggregation.aggregated_df["Output per Minute"].sort_values(
+            sorted_opm = aggregation.aggregated_df["Output (watts)"].sort_values(
                 ascending=False
             )
             fig = px.bar(
                 sorted_opm,
-                title="Output per Minute by {}".format(readable_class_characteristic),
+                title="Output (watts) by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
-                    "value": "Output per Minute",
+                    "value": "Output (watts)",
                 },
             )
             fig.update_xaxes(showgrid=False)
