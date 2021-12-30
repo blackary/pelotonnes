@@ -190,12 +190,12 @@ class Aggregation(object):
                 "Total Distance": pd.Series(total_distance),
                 "Total Output": pd.Series(total_output),
                 "Total Calories": pd.Series(total_calories),
-                "Output (watts)": (100.0 / 6.0)
+                "Avg. Output (watts)": (100.0 / 6.0)
                 * pd.Series(total_output)
                 / pd.Series(total_output_minutes),
-                "Output (kj/m)": pd.Series(total_output)
+                "Avg. Output (kj/m)": pd.Series(total_output)
                 / pd.Series(total_output_minutes),
-                "Calories per Minute": pd.Series(total_calories)
+                "Avg. Calories per Minute": pd.Series(total_calories)
                 / pd.Series(total_calories_minutes),
                 "Avg. Heartrate": pd.Series(total_hr) / pd.Series(total_hr_minutes),
                 "Avg. Speed (mph)": pd.Series(total_speed)
@@ -213,9 +213,9 @@ class Aggregation(object):
                 "Total Distance": "{:,.2f}",
                 "Total Output": "{:,.0f}",
                 "Total Calories": "{:,.0f}",
-                "Output (watts)": "{:,.2f}",
-                "Output (kj/m)": "{:,.2f}",
-                "Calories per Minute": "{:,.2f}",
+                "Avg. Output (watts)": "{:,.2f}",
+                "Avg. Output (kj/m)": "{:,.2f}",
+                "Avg. Calories per Minute": "{:,.2f}",
                 "Avg. Heartrate": "{:,.2f}",
                 "Avg. Speed (mph)": "{:,.2f}",
                 "Avg. Cadence (RPM)": "{:,.2f}",

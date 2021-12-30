@@ -41,7 +41,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig = px.scatter(
                 aggregation.aggregated_df,
                 x="Total Minutes",
-                y="Output (watts)",
+                y="Avg. Output (watts)",
                 text=scatter_text,
                 log_x=log_scale,
             )
@@ -54,7 +54,7 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             fig.update_traces(textposition="top center", marker_size=20)
             st.plotly_chart(fig, use_container_width=True)
         with c2:
-            st.subheader("Output (watts) vs Total Minutes")
+            st.subheader("Avg. Output (watts) vs Total Minutes")
             st.markdown(
                 "This plot shows which classes you spend the most time in vs how hard"
                 + " you work in those workouts. "
@@ -104,9 +104,9 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
         with c1:
             fig = px.scatter(
                 aggregation.aggregated_df,
-                title="Calories per Minute vs Total Minutes",
+                title="Avg. Calories per Minute vs Total Minutes",
                 x="Total Minutes",
-                y="Calories per Minute",
+                y="Avg. Calories per Minute",
                 text=scatter_text,
                 log_x=log_scale,
             )
@@ -120,9 +120,9 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
         with c2:
             fig = px.scatter(
                 aggregation.aggregated_df,
-                title="Calories per Minute vs Avg. Cadence (RPM)",
+                title="Avg. Calories per Minute vs Avg. Cadence (RPM)",
                 x="Avg. Cadence (RPM)",
-                y="Calories per Minute",
+                y="Avg. Calories per Minute",
                 text=scatter_text,
                 log_x=log_scale,
             )
@@ -136,15 +136,15 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
 
         c1, c2 = st.columns(2)
         with c1:
-            sorted_opm = aggregation.aggregated_df["Output (watts)"].sort_values(
+            sorted_opm = aggregation.aggregated_df["Avg. Output (watts)"].sort_values(
                 ascending=False
             )
             fig = px.bar(
                 sorted_opm,
-                title="Output (watts) by {}".format(readable_class_characteristic),
+                title="Avg. Output (watts) by {}".format(readable_class_characteristic),
                 labels={
                     "index": readable_class_characteristic,
-                    "value": "Output (watts)",
+                    "value": "Avg. Output (watts)",
                 },
             )
             fig.update_xaxes(showgrid=False)
@@ -156,15 +156,17 @@ def render_stats_by_class(aggregation: Aggregation, readable_class_characteristi
             st.plotly_chart(fig, use_container_width=True)
 
         with c2:
-            sorted_cpm = aggregation.aggregated_df["Calories per Minute"].sort_values(
-                ascending=False
-            )
+            sorted_cpm = aggregation.aggregated_df[
+                "Avg. Calories per Minute"
+            ].sort_values(ascending=False)
             fig = px.bar(
                 sorted_cpm,
-                title="Calories per Minute by {}".format(readable_class_characteristic),
+                title="Avg. Calories per Minute by {}".format(
+                    readable_class_characteristic
+                ),
                 labels={
                     "index": readable_class_characteristic,
-                    "value": "Calories per Minute",
+                    "value": "Avg. Calories per Minute",
                 },
             )
             fig.update_xaxes(showgrid=False)

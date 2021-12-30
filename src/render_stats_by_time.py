@@ -119,9 +119,12 @@ def render_stats_by_time(aggregation, readable_time_unit):
         c1, c2 = st.columns(2)
         with c1:
             fig = px.line(
-                aggregation.aggregated_df["Output (watts)"].dropna(),
-                title="Output (watts) by {}".format(readable_time_unit),
-                labels={"index": f"{readable_time_unit}", "value": "Output (watts)"},
+                aggregation.aggregated_df["Avg. Output (watts)"].dropna(),
+                title="Avg. Output (watts) by {}".format(readable_time_unit),
+                labels={
+                    "index": f"{readable_time_unit}",
+                    "value": "Avg. Output (watts)",
+                },
             )
             fig.update_xaxes(showgrid=False)
             fig.update_yaxes(showgrid=False)
