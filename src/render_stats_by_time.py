@@ -74,6 +74,24 @@ def render_stats_by_time(aggregation, readable_time_unit):
 
         with c2:
             fig = px.line(
+                aggregation.aggregated_df["Avg. Output (watts)"].dropna(),
+                title="Avg. Output (watts) by {}".format(readable_time_unit),
+                labels={
+                    "index": f"{readable_time_unit}",
+                    "value": "Avg. Output (watts)",
+                },
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
+            fig.update_layout(showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            fig = px.line(
                 aggregation.aggregated_df["Avg. Heartrate"].dropna(),
                 title="Avg. Heartrate by {}".format(readable_time_unit),
                 labels={"index": f"{readable_time_unit}", "value": "Avg. Heartrate"},
@@ -85,6 +103,9 @@ def render_stats_by_time(aggregation, readable_time_unit):
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
+
+        with c2:
+            st.empty()
 
     with st.expander("Visualize Totals", expanded=True):
         c1, c2 = st.columns(2)
@@ -107,38 +128,6 @@ def render_stats_by_time(aggregation, readable_time_unit):
                 aggregation.aggregated_df["Total Output"].dropna(),
                 title="Total Output per {}".format(readable_time_unit),
                 labels={"index": f"{readable_time_unit}", "value": "Total Output"},
-            )
-            fig.update_xaxes(showgrid=False)
-            fig.update_yaxes(showgrid=False)
-            fig.update_layout(
-                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
-            )
-            fig.update_layout(showlegend=False)
-            st.plotly_chart(fig, use_container_width=True)
-
-        c1, c2 = st.columns(2)
-        with c1:
-            fig = px.line(
-                aggregation.aggregated_df["Avg. Output (watts)"].dropna(),
-                title="Avg. Output (watts) by {}".format(readable_time_unit),
-                labels={
-                    "index": f"{readable_time_unit}",
-                    "value": "Avg. Output (watts)",
-                },
-            )
-            fig.update_xaxes(showgrid=False)
-            fig.update_yaxes(showgrid=False)
-            fig.update_layout(
-                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
-            )
-            fig.update_layout(showlegend=False)
-            st.plotly_chart(fig, use_container_width=True)
-
-        with c2:
-            fig = px.line(
-                aggregation.aggregated_df["Total Workouts"].dropna(),
-                title="Total Workouts per {}".format(readable_time_unit),
-                labels={"index": f"{readable_time_unit}", "value": "Total Workouts"},
             )
             fig.update_xaxes(showgrid=False)
             fig.update_yaxes(showgrid=False)
@@ -176,3 +165,21 @@ def render_stats_by_time(aggregation, readable_time_unit):
             )
             fig.update_layout(showlegend=False)
             st.plotly_chart(fig, use_container_width=True)
+
+        c1, c2 = st.columns(2)
+        with c1:
+            fig = px.line(
+                aggregation.aggregated_df["Total Workouts"].dropna(),
+                title="Total Workouts per {}".format(readable_time_unit),
+                labels={"index": f"{readable_time_unit}", "value": "Total Workouts"},
+            )
+            fig.update_xaxes(showgrid=False)
+            fig.update_yaxes(showgrid=False)
+            fig.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)"
+            )
+            fig.update_layout(showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+
+        with c2:
+            st.empty()
