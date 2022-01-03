@@ -12,7 +12,8 @@ def datetime_to_day_index(datetime_obj):
 
 def datetime_to_week_index(datetime_obj):
     return datetime.datetime.strptime(
-        "{}-{}-1".format(datetime_obj.year, datetime_obj.isocalendar()[1]), "%Y-%W-%w"
+        "{}-{}-1".format(datetime_obj.isocalendar()[0], datetime_obj.isocalendar()[1]),
+        "%Y-%W-%w",
     ).date()
 
 
