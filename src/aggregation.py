@@ -41,11 +41,11 @@ def process_workouts_df():
     workouts_df["c_datetime"] = workouts_df["Workout Timestamp"].apply(
         lambda x: parse_datetime(x)
     )
-    workouts_df["c_datetime"] = pd.to_datetime(workouts_df["c_datetime"], utc=True)
     workouts_df["c_day"] = workouts_df["c_datetime"].apply(datetime_to_day_index)
     workouts_df["c_week"] = workouts_df["c_datetime"].apply(datetime_to_week_index)
     workouts_df["c_month"] = workouts_df["c_datetime"].apply(datetime_to_month_index)
     workouts_df["c_year"] = workouts_df["c_datetime"].apply(datetime_to_year_index)
+    workouts_df["c_datetime"] = pd.to_datetime(workouts_df["c_datetime"], utc=True)
 
     date_range = pd.Series(
         pd.date_range(start=workouts_df["c_day"].min(), end=workouts_df["c_day"].max())
