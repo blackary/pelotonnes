@@ -1,7 +1,7 @@
-from collections import defaultdict
 import datetime
+import re
+from collections import defaultdict
 
-import dateparser
 import pandas as pd
 import streamlit as st
 
@@ -33,9 +33,11 @@ def process_workouts_df():
 
     # Convert to datetime
     def parse_datetime(date_str):
-        # This is necessary because some Peloton workouts contain timezones
-        # like (-05) which are not well-handled by dateparser
-        return dateparser.parse(date_str.replace("(-", "(GMT-").replace("(+", "(GMT+"))
+        # Replace (-05) with -05:00 and (+5) with +05:00 using regex
+        date_str = re.sub(r"\(-0(\d)\)", r"-0\1:00", date_str)
+        date_str = re.sub(r"\(+0(\d)\)", r"+0\1:00", date_str)
+
+        return pd.to_datetime(date_str)
 
     # Parse the various versions of the Workout's Timestamp
     workouts_df["c_datetime"] = workouts_df["Workout Timestamp"].apply(
